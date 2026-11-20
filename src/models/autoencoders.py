@@ -35,7 +35,18 @@ class Autoencoder(nn.Module):
         return reconstruction, z
 
 if __name__ == "__main__":
-    m = Autoencoder()
-    x = torch.rand(8, 1, 28, 28)
-    recon, z = m(x)
-    print(recon.shape, z.shape, recon.min().item(), recon.max().item())
+    device = torch.device(
+        "cuda" if torch.cuda.is_available() else "cpu"
+    )
+
+    model = Autoencoder(latent_dim=64).to(device)
+    x = torch.rand(8, 1, 28, 28).to(device)
+
+    recon, z = model(x)
+
+    print("Device:", device)
+    print("Input:", x.shape)
+    print("Reconstruction:", recon.shape)
+    print("Latent:", z.shape)
+    print("Pixel range:", recon.min().item(),
+          recon.max().item())

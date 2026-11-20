@@ -1,12 +1,10 @@
 # Generative Models Comparative Study — Fashion-MNIST
 
-Starter repository for the D6421 take-home assignment.
-
 ## 1. Environment
 
-Recommended: Python 3.10 or 3.11.
+Recommended: Python 3.14 with CUDA 13.2.
 
-```bash
+```bash 
 python -m venv .venv
 ```
 
