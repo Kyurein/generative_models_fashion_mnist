@@ -1,0 +1,9 @@
+{
+    "model": "FrozenLatentDecoder",
+    "test_mse": 0.016425708403740264,
+    "test_psnr": 18.673124313354492,
+    "test_ssim": 0.726966917514801,
+    "best_val_loss": 0.016597220447446617,
+    "epochs": 50,
+    "learning_rate": 0.001
+}
