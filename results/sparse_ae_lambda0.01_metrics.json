@@ -1,0 +1,9 @@
+{
+    "test_mse": 0.00837773413699848,
+    "test_psnr": 21.842281341552734,
+    "test_ssim": 0.8303272724151611,
+    "hidden_sparsity": 0.8237271205357143,
+    "sparsity_threshold": 0.01,
+    "model": "sparse",
+    "sparsity_lambda": 0.01
+}
