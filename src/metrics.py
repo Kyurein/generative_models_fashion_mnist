@@ -49,3 +49,34 @@ def evaluate_reconstruction(model, test_loader, device):
         "test_psnr": test_psnr,
         "test_ssim": test_ssim,
     }
+
+
+def evaluate_hidden_sparsity(
+    model,
+    test_loader,
+    device,
+    threshold=0.01
+):
+    """
+    Measure the fraction of hidden-layer activations
+    below the specified threshold.
+    """
+
+    model.eval()
+
+    inactive_units = 0
+    total_units = 0
+
+    with torch.no_grad():
+        for images, _ in test_loader:
+            images = images.to(device)
+
+            outputs = model(images)
+
+            # Third output is the 256-dimensional hidden layer h
+            h = outputs[2]
+
+            inactive_units += (h < threshold).sum().item()
+            total_units += h.numel()
+
+    return inactive_units / total_units

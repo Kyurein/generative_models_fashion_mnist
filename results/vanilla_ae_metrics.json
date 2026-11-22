@@ -1,5 +1,8 @@
 {
     "test_mse": 0.007677092415945871,
     "test_psnr": 22.256982803344727,
-    "test_ssim": 0.8467116355895996
+    "test_ssim": 0.8467116355895996,
+    "hidden_sparsity": 0.4952282366071429,
+    "sparsity_threshold": 0.01,
+    "model": "vanilla"
 }

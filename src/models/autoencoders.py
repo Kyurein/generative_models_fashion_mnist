@@ -3,14 +3,19 @@ from torch import nn
 
 
 class Autoencoder(nn.Module):
+    """Vanilla Autoencoder."""
 
     def __init__(self, latent_dim=64):
         super().__init__()
 
-        self.encoder = nn.Sequential(
-            nn.Flatten(),
+        self.flatten = nn.Flatten()
+
+        self.encoder_hidden = nn.Sequential(
             nn.Linear(784, 256),
-            nn.ReLU(),
+            nn.ReLU()
+        )
+
+        self.encoder_latent = nn.Sequential(
             nn.Linear(256, latent_dim),
             nn.ReLU()
         )
@@ -23,30 +28,23 @@ class Autoencoder(nn.Module):
         )
 
     def encode(self, x):
-        return self.encoder(x)
+        x = self.flatten(x)
+        h = self.encoder_hidden(x)
+        z = self.encoder_latent(h)
+        return z, h
 
     def decode(self, z):
-        return self.decoder(z).view(-1, 1, 28, 28)
+        reconstruction = self.decoder(z)
+        return reconstruction.view(-1, 1, 28, 28)
 
     def forward(self, x):
-        z = self.encode(x)
+        z, h = self.encode(x)
         reconstruction = self.decode(z)
+        return reconstruction, z, h
 
-        return reconstruction, z
 
-if __name__ == "__main__":
-    device = torch.device(
-        "cuda" if torch.cuda.is_available() else "cpu"
-    )
+class SparseAutoencoder(Autoencoder):
+    """Same architecture as Vanilla AE; sparsity is applied in the loss."""
 
-    model = Autoencoder(latent_dim=64).to(device)
-    x = torch.rand(8, 1, 28, 28).to(device)
-
-    recon, z = model(x)
-
-    print("Device:", device)
-    print("Input:", x.shape)
-    print("Reconstruction:", recon.shape)
-    print("Latent:", z.shape)
-    print("Pixel range:", recon.min().item(),
-          recon.max().item())
+    def __init__(self, latent_dim=64):
+        super().__init__(latent_dim=latent_dim)

@@ -1,3 +1,4 @@
+import argparse
 import json
 from pathlib import Path
 
@@ -5,31 +6,59 @@ import torch
 
 from src.data import build_dataloaders
 from src.utils import get_device
-from src.models.autoencoders import Autoencoder
-from src.metrics import evaluate_reconstruction
+from src.models.autoencoders import Autoencoder, SparseAutoencoder
+from src.metrics import (
+    evaluate_reconstruction,
+    evaluate_hidden_sparsity
+)
 
 
 def main():
-    # 1. Setup device
+    parser = argparse.ArgumentParser(
+        description="Evaluate Autoencoder on Fashion-MNIST test set"
+    )
+
+    parser.add_argument(
+        "--model",
+        choices=["vanilla", "sparse"],
+        default="vanilla"
+    )
+
+    parser.add_argument(
+        "--sparsity_lambda",
+        type=float,
+        default=1e-3
+    )
+
+    args = parser.parse_args()
+
+    if args.sparsity_lambda < 0:
+        parser.error("--sparsity_lambda cannot be negative")
+
     device = get_device()
     print(f"Evaluation device: {device}")
 
-    # 2. Load dataset
-    train_loader, val_loader, test_loader = build_dataloaders()
-
+    # Load test dataset
+    _, _, test_loader = build_dataloaders()
     print(f"Test batches: {len(test_loader)}")
 
-    # 3. Initialize Autoencoder
-    model = Autoencoder(latent_dim=64).to(device)
+    # Initialize selected model and checkpoint name
+    if args.model == "sparse":
+        model = SparseAutoencoder(latent_dim=64).to(device)
+        lambda_tag = f"{args.sparsity_lambda:g}"
+        run_name = f"sparse_ae_lambda{lambda_tag}"
+    else:
+        model = Autoencoder(latent_dim=64).to(device)
+        run_name = "vanilla_ae"
 
-    # 4. Load best trained checkpoint
-    checkpoint_path = Path("checkpoints/vanilla_ae_best.pth")
+    checkpoint_path = Path("checkpoints") / f"{run_name}_best.pth"
 
     if not checkpoint_path.exists():
         raise FileNotFoundError(
             f"Checkpoint not found: {checkpoint_path}"
         )
 
+    # Load trained weights
     state_dict = torch.load(
         checkpoint_path,
         map_location=device,
@@ -39,36 +68,54 @@ def main():
     model.load_state_dict(state_dict)
     model.eval()
 
-    print("Vanilla Autoencoder checkpoint loaded successfully.")
+    print(f"Loaded checkpoint: {checkpoint_path}")
 
-    # 5. Evaluate reconstruction performance
+    # Evaluate reconstruction metrics
     metrics = evaluate_reconstruction(
         model=model,
         test_loader=test_loader,
         device=device
     )
 
-    # 6. Save evaluation results
+    # Evaluate hidden-layer sparsity
+    hidden_sparsity = evaluate_hidden_sparsity(
+        model=model,
+        test_loader=test_loader,
+        device=device,
+        threshold=0.01
+    )
+
+    metrics["hidden_sparsity"] = hidden_sparsity
+    metrics["sparsity_threshold"] = 0.01
+    metrics["model"] = args.model
+
+    if args.model == "sparse":
+        metrics["sparsity_lambda"] = args.sparsity_lambda
+
+    # Save metrics
     results_dir = Path("results")
     results_dir.mkdir(parents=True, exist_ok=True)
 
-    output_path = results_dir / "vanilla_ae_metrics.json"
+    output_path = results_dir / f"{run_name}_metrics.json"
 
     with open(output_path, "w", encoding="utf-8") as file:
         json.dump(metrics, file, indent=4)
 
-    # 7. Display results
+    # Display results
     print("\n" + "=" * 50)
-    print("VANILLA AUTOENCODER - TEST RESULTS")
+    print(f"{args.model.upper()} AUTOENCODER TEST RESULTS")
     print("=" * 50)
+    print(f"Test MSE: {metrics['test_mse']:.6f}")
+    print(f"Test PSNR: {metrics['test_psnr']:.4f} dB")
+    print(f"Test SSIM: {metrics['test_ssim']:.4f}")
+    print(f"Hidden sparsity: {hidden_sparsity:.2%}")
 
-    print(f"Test MSE  : {metrics['test_mse']:.6f}")
-    print(f"Test PSNR : {metrics['test_psnr']:.4f} dB")
-    print(f"Test SSIM : {metrics['test_ssim']:.4f}")
+    if args.model == "sparse":
+        print(f"Sparsity lambda: {args.sparsity_lambda:g}")
 
-    print("=" * 50)
-    print(f"Results saved to: {output_path}")
+    print(f"\nMetrics saved to: {output_path}")
 
 
 if __name__ == "__main__":
     main()
+
