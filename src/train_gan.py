@@ -17,14 +17,18 @@ def build_models(model_name, latent_dim, device):
         discriminator = Discriminator()
 
     elif model_name == "dcgan":
-        # This module will be created when implementing DCGAN.
         from src.models.dcgan import (
             Generator as DCGenerator,
-            Discriminator as DCDiscriminator
+            Discriminator as DCDiscriminator,
+            weights_init
         )
 
         generator = DCGenerator(latent_dim=latent_dim)
         discriminator = DCDiscriminator()
+
+        # DCGAN weight initialization: N(0, 0.02)
+        generator.apply(weights_init)
+        discriminator.apply(weights_init)
 
     else:
         raise ValueError(f"Unknown model: {model_name}")
