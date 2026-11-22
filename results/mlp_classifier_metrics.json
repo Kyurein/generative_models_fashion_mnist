@@ -1,0 +1,9 @@
+{
+    "model": "MLPClassifier",
+    "best_val_accuracy": 0.8948571428571429,
+    "test_loss": 0.31855624198913574,
+    "test_accuracy": 0.8935714285714286,
+    "test_accuracy_percent": 89.35714285714286,
+    "epochs": 20,
+    "learning_rate": 0.001
+}
