@@ -1,0 +1,15 @@
+{
+    "dataset": "Fashion-MNIST",
+    "real_reference": "test",
+    "fid_feature": 2048,
+    "scores": {
+        "vanilla_ae": 162.08297729492188,
+        "sparse_ae": 166.9609375,
+        "vae": 84.21675872802734,
+        "mlp_gan": 123.42597961425781,
+        "dcgan": 21.841609954833984,
+        "ddpm": 11.243757247924805
+    },
+    "real_samples": 7000,
+    "generated_samples_per_model": 7000
+}
