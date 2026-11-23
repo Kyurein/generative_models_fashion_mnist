@@ -1,0 +1,60 @@
+{
+    "device": "cuda",
+    "inference_batch_size": 64,
+    "inference": {
+        "vanilla_ae": {
+            "average_ms": 0.4026000067824498,
+            "average_seconds": 0.0004026000067824498,
+            "runs": 20,
+            "warmup_runs": 5
+        },
+        "sparse_ae": {
+            "average_ms": 0.49254498735535884,
+            "average_seconds": 0.0004925449873553589,
+            "runs": 20,
+            "warmup_runs": 5
+        },
+        "vae": {
+            "average_ms": 0.5044599965913221,
+            "average_seconds": 0.0005044599965913221,
+            "runs": 20,
+            "warmup_runs": 5
+        },
+        "mlp_gan": {
+            "average_ms": 0.5221700033871457,
+            "average_seconds": 0.0005221700033871457,
+            "runs": 20,
+            "warmup_runs": 5
+        },
+        "dcgan": {
+            "average_ms": 15.613709998433478,
+            "average_seconds": 0.015613709998433478,
+            "runs": 20,
+            "warmup_runs": 5
+        },
+        "ddpm": {
+            "average_ms": 18599.806766685408,
+            "average_seconds": 18.599806766685408,
+            "runs": 3,
+            "warmup_runs": 1
+        }
+    },
+    "gan_training": {
+        "mlp_gan": {
+            "epoch_times_seconds": [
+                7.556381999980658,
+                8.410882800002582
+            ],
+            "average_seconds_per_epoch": 7.98363239999162,
+            "measured_epochs": 2
+        },
+        "dcgan": {
+            "epoch_times_seconds": [
+                36.978806099970825,
+                36.866428299981635
+            ],
+            "average_seconds_per_epoch": 36.92261719997623,
+            "measured_epochs": 2
+        }
+    }
+}

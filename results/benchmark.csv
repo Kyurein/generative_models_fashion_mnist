@@ -1,0 +1,7 @@
+model,inference_batch_size,inference_latency_ms,inference_latency_seconds,inference_runs,training_time_per_epoch_seconds
+vanilla_ae,64,0.4026,0.000403,20,
+sparse_ae,64,0.4925,0.000493,20,
+vae,64,0.5045,0.000504,20,
+mlp_gan,64,0.5222,0.000522,20,7.9836
+dcgan,64,15.6137,0.015614,20,36.9226
+ddpm,64,18599.8068,18.599807,3,
